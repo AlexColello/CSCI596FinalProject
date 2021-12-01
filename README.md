@@ -8,4 +8,4 @@ This project aims improve the quality of automatic printed circuit board routing
 This project uses [freerouting](https://github.com/freerouting/freerouting) to perform the autorouting steps, an open source autorouting project.
 
 ### Overview
-![Diagram](./diagram.png | width=100)
+![Diagram](./diagram.png)
