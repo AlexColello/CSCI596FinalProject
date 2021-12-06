@@ -11,3 +11,10 @@ A significant issue with the current implementation id that the router tries to 
 
 ### Overview
 ![Diagram](./diagram.png)
+
+### Usage
+
+To run freerouter test:
+```
+java -jar .\freerouting-1.4.5.1.jar -de .\StickHub.dsn -do .\StickHub.ses -mp 100 -mt 12
+```
