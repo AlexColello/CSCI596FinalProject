@@ -12,6 +12,10 @@ A significant issue with the current implementation id that the router tries to 
 ### Overview
 ![Diagram](./diagram.png)
 
+### Installation
+
+Install Java 11+ from https://www.oracle.com/java/technologies/downloads/
+
 ### Usage
 
 To run freerouter test:
