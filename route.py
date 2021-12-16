@@ -1,9 +1,9 @@
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 import shlex
 import os, shutil, re
 import multiprocessing as mp
 from pathlib import Path
-
+import logging
 
 PARENT_DIR = Path(__file__).absolute().parent
 
@@ -14,11 +14,14 @@ incomplete_regex = re.compile(r"incomplete: \d.*\n")
 num_iterations = 100
 num_cores = mp.cpu_count()
 num_runs = 12
+num_passes = 1
 
 input_path = PARENT_DIR / 'test_data' / 'StickHub.dsn'
 output_folder = PARENT_DIR / 'output'
 jar_path = PARENT_DIR / 'freerouting-executable.jar'
 command_path = ['java', '-jar', str(jar_path)]
+
+logging.basicConfig(filename=output_folder / 'route.log', encoding='utf-8', level=logging.DEBUG)
 
 def get_iteration_directory(iteration_num):
     return output_folder / f'iter_{iteration_num}'
@@ -64,7 +67,7 @@ def parse_results(iteration, run_num):
     results.trace_length = trace_length
     results.incomplete = incomplete
 
-    print(f"iteration: {iteration}, run: {run_num}, vias: {vias}, trace length: {trace_length}, incomplete: {incomplete} ")
+    logging.info(f"iteration: {iteration}, run: {run_num}, vias: {vias}, trace length: {trace_length}, incomplete: {incomplete} ")
 
     return results
 
@@ -85,12 +88,12 @@ def select_best_dsn(iteration):
 
     results = filter(lambda x: -1 not in (x.vias, x.trace_length, x.incomplete), results)
     best = min(results, key=calc_cost)
-    print(f'Selected iteration {best.iteration} run {best.run}')
+    logging.info(f'Selected iteration {best.iteration} run {best.run}')
 
     return get_run_directory(best.iteration, best.run) / 'output.dsn'
 
 def run_routing(iteration, run_num):
-    print(f'Starting run {run_num} iteration {iteration}')
+    print(f'Starting iteration {iteration} run {run_num}')
     iteration_folder = get_iteration_directory(iteration)
     run_folder = get_run_directory(iteration, run_num)
     os.mkdir(run_folder)
@@ -98,10 +101,13 @@ def run_routing(iteration, run_num):
     shutil.copyfile(iteration_folder / 'initial.dsn', input_path)
     
     output_path = run_folder / 'output.dsn'
-    args = ['-de', input_path, '-do', output_path, '-mp', '1', '-mt', '1', '-is', 'random', '-test']
+    args = ['-de', input_path, '-do', output_path, '-mp', str(num_passes), '-mt', '1', '-is', 'random', '-test']
 
     process = Popen(command_path + args, cwd=run_folder)
-    process.wait()
+    try:
+        process.wait(timeout=120*num_passes)
+    except TimeoutExpired:
+        process.kill()
     
     print(f'Finished iteration {iteration} run {run_num}')
 
@@ -112,7 +118,7 @@ def main():
     shutil.rmtree(output_folder, ignore_errors=True)
 
     #pool_size = num_cores
-    pool_size = 4
+    pool_size = 3
     previous_best_path = input_path
     with mp.Pool(pool_size) as p:
         for iteration in range(num_iterations):
