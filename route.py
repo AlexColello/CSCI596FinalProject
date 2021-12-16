@@ -11,9 +11,9 @@ via_regex = re.compile(r" with .* vias and .*\n")
 trace_length_regex = re.compile(r"vias and .* trace length")
 incomplete_regex = re.compile(r"incomplete: \d.*\n")
 
-num_iterations = 3
+num_iterations = 100
 num_cores = mp.cpu_count()
-num_runs = 2
+num_runs = 12
 
 input_path = PARENT_DIR / 'test_data' / 'StickHub.dsn'
 output_folder = PARENT_DIR / 'output'
@@ -111,7 +111,7 @@ def main():
     shutil.rmtree(output_folder, ignore_errors=True)
 
     #pool_size = num_cores
-    pool_size = 2
+    pool_size = 4
     previous_best_path = input_path
     with mp.Pool(pool_size) as p:
         for iteration in range(num_iterations):
