@@ -21,7 +21,15 @@ output_folder = PARENT_DIR / 'output'
 jar_path = PARENT_DIR / 'freerouting-executable.jar'
 command_path = ['java', '-jar', str(jar_path)]
 
+try:
+    os.remove(output_folder / 'route.log')
+except OSError:
+    pass
+
 logging.basicConfig(filename=output_folder / 'route.log', encoding='utf-8', level=logging.DEBUG)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+logging.getLogger().addHandler(console)
 
 def get_iteration_directory(iteration_num):
     return output_folder / f'iter_{iteration_num}'
@@ -108,6 +116,7 @@ def run_routing(iteration, run_num):
         process.wait(timeout=120*num_passes)
     except TimeoutExpired:
         process.kill()
+        logging.info(f'Killed iteration {iteration} run {run}')
     
     print(f'Finished iteration {iteration} run {run_num}')
 
