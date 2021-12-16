@@ -83,6 +83,7 @@ def select_best_dsn(iteration):
     for run in range(num_runs):
         results.append(parse_results(iteration, run))
 
+    results = filter(lambda x: -1 not in (x.vias, x.trace_length, x.incomplete), results)
     best = min(results, key=calc_cost)
     print(f'Selected iteration {best.iteration} run {best.run}')
 
