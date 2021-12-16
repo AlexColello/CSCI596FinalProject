@@ -30,4 +30,4 @@ By running significantly more runs each iteration, the script was able to comple
 
 ## Future work
 
-In the future this could be integrated into the Freerouting project instead of running as a separate script. This would significantly spead up the 
+In the future this could be integrated into the Freerouting project instead of running as a separate script. This would significantly speed up the process, since most of the time was spent reading and saving files.
