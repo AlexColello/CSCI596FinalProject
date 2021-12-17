@@ -116,7 +116,7 @@ def run_routing(iteration, run_num):
         process.wait(timeout=120*num_passes)
     except TimeoutExpired:
         process.kill()
-        logging.info(f'Killed iteration {iteration} run {run}')
+        logging.info(f'Killed iteration {iteration} run {run_num}')
     
     print(f'Finished iteration {iteration} run {run_num}')
 
